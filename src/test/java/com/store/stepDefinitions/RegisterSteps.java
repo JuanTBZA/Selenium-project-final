@@ -21,12 +21,7 @@ public class RegisterSteps {
 	LoginPage loginPage;
 	RegisterPage registerPage;
 
-	@Given("el usuario accede a Juice Shop")
-	public void accederASitio() {
-		driver = returnDriver();
-		homePage = new HomePage(driver);
-		homePage.cerrarPopupInicialSiExiste();
-	}
+
 
 	@And("navega desde Login hasta el formulario de registro")
 	public void irARegistro() {
