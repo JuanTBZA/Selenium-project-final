@@ -25,8 +25,11 @@ public class RegisterSteps {
 
 	@And("navega desde Login hasta el formulario de registro")
 	public void irARegistro() {
+		driver = returnDriver();
+		homePage = new HomePage(driver);
 		homePage.irASeccionLogin();
 		loginPage = new LoginPage(driver);
+
 		loginPage.irAFormularioRegistro();
 	}
 
