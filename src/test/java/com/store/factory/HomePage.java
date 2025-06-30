@@ -33,4 +33,25 @@ public class HomePage {
         wait.until(ExpectedConditions.elementToBeClickable(botonAccount)).click();
         wait.until(ExpectedConditions.elementToBeClickable(botonLogin)).click();
     }
+
+    public void irASeccionAccount() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement botonAccount = wait.until(ExpectedConditions.elementToBeClickable(By.id("navbarAccount")));
+        botonAccount.click();
+    }
+
+    public void irAMisDirecciones() {
+        // Paso 1: clic en "Orders & Payment"
+        WebElement ordersYPagos = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//button[@aria-label='Show Orders and Payment Menu']")
+        ));
+        ordersYPagos.click();
+
+        // Paso 2: clic en "My saved addresses"
+        WebElement direccionGuardada = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//button[@aria-label='Go to saved address page']"))
+        );
+        direccionGuardada.click();
+    }
+
 }
