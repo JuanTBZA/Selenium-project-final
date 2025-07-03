@@ -12,7 +12,7 @@ import io.cucumber.java.Scenario;
 
 public class Hooks extends Base {
 
-	private WebDriver driver;
+	public static WebDriver driver;
 	private Properties prop;
 	private Base driverBase;
 

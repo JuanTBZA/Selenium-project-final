@@ -54,4 +54,19 @@ public class HomePage {
         direccionGuardada.click();
     }
 
+    public void irAMisMetodosDePago() {
+        // Paso 1: clic en "Orders & Payment"
+        WebElement ordersYPagos = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//button[@aria-label='Show Orders and Payment Menu']")
+        ));
+        ordersYPagos.click();
+
+        // Paso 2: clic en "My Payment Options"
+        WebElement opcionPago = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//button[@aria-label='Go to saved payment methods page']"))
+        );
+        opcionPago.click();
+    }
+
+
 }
