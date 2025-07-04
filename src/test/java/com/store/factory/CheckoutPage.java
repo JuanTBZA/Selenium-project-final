@@ -2,10 +2,8 @@ package com.store.factory;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.*;
+import org.openqa.selenium.support.ui.*;
 
 import java.time.Duration;
 import java.util.List;
@@ -18,30 +16,6 @@ public class CheckoutPage {
     @FindBy(id = "checkoutButton")
     protected WebElement btnCheckout;
 
-    @FindBy(xpath = "//h1[contains(text(),'Select an address')]")
-    private WebElement tituloSeleccionDireccion;
-
-    @FindBy(css = "mat-radio-button input[type='radio']")
-    private List<WebElement> radiosDireccion;
-
-    @FindBy(css = "button[aria-label='Proceed to payment selection']")
-    private WebElement btnIrMetodoPago;
-
-    @FindBy(xpath = "//h1[contains(text(),'Choose a delivery speed')]")
-    private WebElement tituloMetodoEntrega;
-
-    @FindBy(css = "mat-radio-button")
-    private List<WebElement> radiosEntrega;
-
-    @FindBy(xpath = "//button[.//span[contains(text(),'Continue')]]")
-    private WebElement btnContinuarEntrega;
-
-    @FindBy(css = "input[type='radio']")
-    private List<WebElement> radiosPago;
-
-    @FindBy(xpath = "//button[.//span[contains(text(), 'Continue') or contains(text(), 'Proceed to review')]]")
-    private WebElement btnContinuarPago;
-
     public CheckoutPage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -49,57 +23,80 @@ public class CheckoutPage {
     }
 
     public void seleccionarDireccionPorIndice(int index) {
-        wait.until(ExpectedConditions.visibilityOf(tituloSeleccionDireccion));
-        wait.until(d -> radiosDireccion.size() > index);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//h1[contains(text(),'Select an address')]")));
 
-        WebElement radio = radiosDireccion.get(index);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", radio);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", radio);
+        List<WebElement> radios = wait.until(ExpectedConditions
+                .numberOfElementsToBeMoreThan(By.cssSelector("mat-radio-button input[type='radio']"), index));
 
-        wait.until(ExpectedConditions.elementToBeClickable(btnIrMetodoPago)).click();
+        WebElement radioInput = radios.get(index);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", radioInput);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", radioInput);
+
+        WebElement btnContinuar = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("button[aria-label='Proceed to payment selection']:not([disabled])")));
+        btnContinuar.click();
     }
 
     public void seleccionarMetodoEntregaPorIndice(int index) {
-        wait.until(ExpectedConditions.visibilityOf(tituloMetodoEntrega));
-        wait.until(d -> radiosEntrega.size() > index);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//h1[contains(text(),'Choose a delivery speed')]")));
 
-        WebElement opcion = radiosEntrega.get(index);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", opcion);
-        wait.until(ExpectedConditions.elementToBeClickable(opcion)).click();
+        List<WebElement> radios = wait.until(ExpectedConditions
+                .numberOfElementsToBeMoreThan(By.cssSelector("mat-radio-button"), index));
 
-        ((JavascriptExecutor) driver).executeScript("arguments[0].removeAttribute('disabled');", btnContinuarEntrega);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", btnContinuarEntrega);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btnContinuarEntrega);
+        WebElement matRadioButton = radios.get(index);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", matRadioButton);
+        wait.until(ExpectedConditions.elementToBeClickable(matRadioButton)).click();
+
+        WebElement btnContinuar = wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("//button[.//span[contains(text(),'Continue')]]")));
+
+        ((JavascriptExecutor) driver).executeScript("arguments[0].removeAttribute('disabled');", btnContinuar);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", btnContinuar);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btnContinuar);
     }
 
     public void seleccionarMetodoPagoPorIndice(int index) {
-        wait.until(d -> radiosPago.size() > index);
-        WebElement tarjeta = radiosPago.get(index);
+        List<WebElement> radios = wait.until(driver -> {
+            List<WebElement> elementos = driver.findElements(By.cssSelector("input[type='radio']"));
+            return elementos.size() > index ? elementos : null;
+        });
+
+        WebElement tarjeta = radios.get(index);
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", tarjeta);
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", tarjeta);
 
-        wait.until(d -> btnContinuarPago.isEnabled());
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", btnContinuarPago);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btnContinuarPago);
+        WebElement btnContinuar = wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("//button[.//span[contains(text(), 'Continue') or contains(text(), 'Proceed to review')]]")));
+
+        wait.until(driver -> btnContinuar.isEnabled());
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", btnContinuar);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btnContinuar);
     }
 
     public void confirmarYFinalizarOrden() {
-        wait.until(ExpectedConditions.visibilityOf(btnCheckout));
-        wait.until(ExpectedConditions.elementToBeClickable(btnCheckout));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", btnCheckout);
-
-        if (!btnCheckout.isEnabled()) {
-            throw new ElementNotInteractableException("El botón de pago está deshabilitado");
-        }
-
         try {
-            new Actions(driver).moveToElement(btnCheckout).pause(500).click().perform();
-        } catch (Exception e1) {
-            try {
-                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btnCheckout);
-            } catch (Exception e2) {
-                btnCheckout.click();
+            WebElement btnPagar = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("checkoutButton")));
+            wait.until(ExpectedConditions.visibilityOf(btnPagar));
+            wait.until(ExpectedConditions.elementToBeClickable(btnPagar));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", btnPagar);
+
+            if (!btnPagar.isEnabled()) {
+                throw new ElementNotInteractableException("El botón de pago está deshabilitado");
             }
+
+            try {
+                new Actions(driver).moveToElement(btnPagar).pause(500).click().perform();
+            } catch (Exception e1) {
+                try {
+                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btnPagar);
+                } catch (Exception e2) {
+                    btnPagar.click();
+                }
+            }
+        } catch (Exception e) {
+            throw e;
         }
     }
 

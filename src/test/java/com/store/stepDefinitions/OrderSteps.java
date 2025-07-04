@@ -34,7 +34,7 @@ public class OrderSteps {
 
     @When("procede al checkout desde el carrito")
     public void procederAlCheckout() {
-        driver = CommonSteps.driver;
+        driver = CommonSteps.driver; // ← ¡Esto es
         cartPage = new CartPage(driver);
         cartPage.openCartAndCheckout();
     }
