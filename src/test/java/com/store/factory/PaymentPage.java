@@ -1,6 +1,5 @@
 package com.store.factory;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -33,6 +32,9 @@ public class PaymentPage extends BasePage {
 
     @FindBy(css = "button[type='submit']")
     private WebElement botonEnviar;
+
+    @FindBy(css = "div.mat-mdc-snack-bar-label")
+    private List<WebElement> mensajesSnackbar;
 
     public PaymentPage(WebDriver driver) {
         super(driver);
@@ -71,16 +73,9 @@ public class PaymentPage extends BasePage {
      */
     public boolean mensajeConfirmacionPresente() {
         try {
-            return wait.until(d -> {
-                List<WebElement> snackbars = d.findElements(By.cssSelector("div.mat-mdc-snack-bar-label"));
-                for (WebElement snackbar : snackbars) {
-                    String texto = snackbar.getText().trim();
-                    if (texto.matches("(?i)^Your card ending with \\d{4} has been saved for your convenience\\.?$")) {
-                        return true;
-                    }
-                }
-                return false;
-            });
+            return wait.until(d -> mensajesSnackbar.stream()
+                    .anyMatch(sn -> sn.getText().trim()
+                            .matches("(?i)^Your card ending with \\d{4} has been saved for your convenience\\.?$")));
         } catch (TimeoutException e) {
             return false;
         }
