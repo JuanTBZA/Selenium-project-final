@@ -1,77 +1,80 @@
 package com.store.factory;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 
-import java.time.Duration;
 import java.util.List;
 
-public class PaymentPage {
+/**
+ * Page Object que gestiona la sección de métodos de pago. Cada componente
+ * relevante del formulario se define como atributo para facilitar su uso.
+ */
+public class PaymentPage extends BasePage {
 
-    private final WebDriver driver;
-    private final WebDriverWait wait;
+    @FindBy(css = "mat-expansion-panel")
+    private WebElement panelNuevaTarjeta;
+
+    @FindBy(xpath = "//label[contains(.,'Name')]/following::input[1]")
+    private WebElement inputNombre;
+
+    @FindBy(xpath = "//label[contains(.,'Card Number')]/following::input[1]")
+    private WebElement inputNumeroTarjeta;
+
+    @FindBy(xpath = "//label[contains(.,'Expiry Month')]/following::select[1]")
+    private WebElement selectMesExpiracion;
+
+    @FindBy(xpath = "//label[contains(.,'Expiry Year')]/following::select[1]")
+    private WebElement selectAnioExpiracion;
+
+    @FindBy(css = "button[type='submit']")
+    private WebElement botonEnviar;
 
     public PaymentPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(8));
+        super(driver);
     }
 
+    /**
+     * Despliega la sección para agregar una nueva tarjeta.
+     */
     public void abrirFormularioNuevaTarjeta() {
-        WebElement panel = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector("mat-expansion-panel")));
-        panel.click();
+        wait.until(ExpectedConditions.elementToBeClickable(panelNuevaTarjeta)).click();
     }
 
+    /**
+     * Completa el formulario con los datos de la tarjeta.
+     */
+    public void llenarFormulario(String nombre, String numero, String mes, String anio) {
+        inputNombre.clear();
+        inputNombre.sendKeys(nombre);
 
-    public void llenarFormulario(String name, String cardNumber, String month, String year) {
-        System.out.println("🔍 Buscando input con label 'Name'...");
-        WebElement inputName = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//label[contains(.,'Name')]/following::input[1]")
-        ));
-        inputName.clear();
-        inputName.sendKeys(name);
-        System.out.println("✅ Nombre ingresado: " + name);
+        inputNumeroTarjeta.clear();
+        inputNumeroTarjeta.sendKeys(numero);
 
-        System.out.println("🔍 Buscando input con label 'Card Number'...");
-        WebElement inputCard = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//label[contains(.,'Card Number')]/following::input[1]")
-        ));
-        inputCard.clear();
-        inputCard.sendKeys(cardNumber);
-        System.out.println("✅ Número de tarjeta ingresado: " + cardNumber);
-
-        System.out.println("🔍 Buscando select 'Expiry Month'...");
-        WebElement selectMes = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//label[contains(.,'Expiry Month')]/following::select[1]")
-        ));
-        new Select(selectMes).selectByVisibleText(month);
-        System.out.println("✅ Mes seleccionado: " + month);
-
-        System.out.println("🔍 Buscando select 'Expiry Year'...");
-        WebElement selectAnio = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//label[contains(.,'Expiry Year')]/following::select[1]")
-        ));
-        new Select(selectAnio).selectByVisibleText(year);
-        System.out.println("✅ Año seleccionado: " + year);
+        new Select(selectMesExpiracion).selectByVisibleText(mes);
+        new Select(selectAnioExpiracion).selectByVisibleText(anio);
     }
 
-
-
-
-
-
+    /**
+     * Envía el formulario para guardar la tarjeta.
+     */
     public void enviarFormulario() {
-        WebElement boton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
-        boton.click();
+        wait.until(ExpectedConditions.elementToBeClickable(botonEnviar)).click();
     }
 
+    /**
+     * Verifica que aparezca el mensaje de confirmación en pantalla.
+     */
     public boolean mensajeConfirmacionPresente() {
         try {
-            return wait.until(driver -> {
-                List<WebElement> snackbars = driver.findElements(By.cssSelector("div.mat-mdc-snack-bar-label"));
+            return wait.until(d -> {
+                List<WebElement> snackbars = d.findElements(By.cssSelector("div.mat-mdc-snack-bar-label"));
                 for (WebElement snackbar : snackbars) {
                     String texto = snackbar.getText().trim();
-                    System.out.println("💬 Snackbar encontrado: '" + texto + "'");
                     if (texto.matches("(?i)^Your card ending with \\d{4} has been saved for your convenience\\.?$")) {
                         return true;
                     }
@@ -79,10 +82,7 @@ public class PaymentPage {
                 return false;
             });
         } catch (TimeoutException e) {
-            System.out.println("❌ No apareció el mensaje esperado.");
             return false;
         }
     }
-
-
 }
