@@ -11,6 +11,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class ProductPage {
 
@@ -63,26 +65,31 @@ public class ProductPage {
 
 
 
-    public void agregarProductosAleatorios(int cantidad) {
-        List<WebElement> tarjetasPagina = wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(
-                By.cssSelector("mat-card"), cantidad - 1));
+public void agregarProductosAleatorios(int cantidad) {
+    // Espera a que haya al menos "cantidad" de tarjetas de productos visibles
+    List<WebElement> tarjetas = wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(
+            By.cssSelector("mat-card"), cantidad - 1));
 
-        List<WebElement> tarjetasConBoton = tarjetasPagina.stream()
-                .filter(t -> !t.findElements(By.cssSelector("button[aria-label='Add to Basket']")).isEmpty())
-                .toList();
+    // Filtra aquellas tarjetas que tienen un botón "Add to Basket"
+    List<WebElement> tarjetasConBoton = tarjetas.stream()
+            .filter(t -> !t.findElements(By.cssSelector("button[aria-label='Add to Basket']")).isEmpty())
+            .toList();
 
-        if (tarjetasConBoton.size() < cantidad) {
-            throw new RuntimeException("No hay suficientes productos con botón 'Add to Basket'.");
-        }
-
-        List<WebElement> aleatorias = new ArrayList<>(tarjetasConBoton);
-        Collections.shuffle(aleatorias);
-
-        for (int i = 0; i < cantidad; i++) {
-            WebElement boton = aleatorias.get(i).findElement(By.cssSelector("button[aria-label='Add to Basket']"));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", boton);
-            wait.until(ExpectedConditions.elementToBeClickable(boton)).click();
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.mat-mdc-snack-bar-label")));
-        }
+    // Verifica si hay suficientes productos con botón disponible
+    if (tarjetasConBoton.size() < cantidad) {
+        throw new RuntimeException("No hay suficientes productos con botón 'Add to Basket'.");
     }
+
+    // Selecciona aleatoriamente 'cantidad' de productos
+    List<WebElement> aleatorias = new ArrayList<>(tarjetasConBoton);
+    Collections.shuffle(aleatorias);
+
+    for (int i = 0; i < cantidad; i++) {
+        WebElement boton = aleatorias.get(i).findElement(By.cssSelector("button[aria-label='Add to Basket']"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", boton);
+        wait.until(ExpectedConditions.elementToBeClickable(boton)).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.mat-mdc-snack-bar-label")));
+    }
+}
+
 }
