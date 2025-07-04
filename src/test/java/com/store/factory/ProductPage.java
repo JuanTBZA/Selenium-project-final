@@ -7,6 +7,8 @@ import org.openqa.selenium.support.ui.*;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class ProductPage {
 
@@ -81,32 +83,26 @@ public class ProductPage {
 
 
 
-    private boolean esperarSnackbarProducto(String producto) {
-        try {
-            return wait.until(driver -> {
-                List<WebElement> snackbars = driver.findElements(By.cssSelector("div.mat-mdc-snack-bar-label"));
-                for (WebElement snackbar : snackbars) {
-                    String mensaje = snackbar.getText().toLowerCase();
-                    if ((mensaje.contains("added") || mensaje.contains("basket")) &&
-                            mensaje.contains(producto.toLowerCase())) {
-                        System.out.println("✅ Producto agregado: " + mensaje);
-                        return true;
-                    }
-                }
-                return false;
-            });
-        } catch (TimeoutException e) {
-            System.out.println("❌ Timeout esperando snackbar de: " + producto);
-            return false;
-        }
-    }
+    public void agregarProductosAleatorios(int cantidad) {
+        List<WebElement> tarjetas = wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(
+                By.cssSelector("mat-card"), cantidad - 1));
 
-    private boolean isInputBusquedaVisible() {
-        try {
-            WebElement input = driver.findElement(By.cssSelector("input.mat-mdc-input-element"));
-            return input.isDisplayed() && input.isEnabled();
-        } catch (NoSuchElementException e) {
-            return false;
+        List<WebElement> tarjetasConBoton = tarjetas.stream()
+                .filter(t -> !t.findElements(By.cssSelector("button[aria-label='Add to Basket']")).isEmpty())
+                .toList();
+
+        if (tarjetasConBoton.size() < cantidad) {
+            throw new RuntimeException("No hay suficientes productos con botón 'Add to Basket'.");
+        }
+
+        List<WebElement> aleatorias = new ArrayList<>(tarjetasConBoton);
+        Collections.shuffle(aleatorias);
+
+        for (int i = 0; i < cantidad; i++) {
+            WebElement boton = aleatorias.get(i).findElement(By.cssSelector("button[aria-label='Add to Basket']"));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", boton);
+            wait.until(ExpectedConditions.elementToBeClickable(boton)).click();
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.mat-mdc-snack-bar-label")));
         }
     }
 }
