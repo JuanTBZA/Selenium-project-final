@@ -26,8 +26,6 @@ public class LoginPage extends BasePage {
     @FindBy(id = "loginButton")
     private WebElement loginButton;
 
-    @FindBy(css = ".mat-mdc-snack-bar-label.mdc-snackbar__label")
-    private WebElement snackbar;
 
     public void ingresarCredenciales(String email, String password) {
         wait.until(ExpectedConditions.visibilityOf(emailInput)).clear();
@@ -43,11 +41,6 @@ public class LoginPage extends BasePage {
         loginButton.click();
     }
 
-
-
-    public String obtenerMensajeBienvenida() {
-        return wait.until(ExpectedConditions.visibilityOf(snackbar)).getText().trim();
-    }
 
 
     public LoginPage(WebDriver driver) {
