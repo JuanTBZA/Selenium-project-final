@@ -1,36 +1,36 @@
 package com.store.factory;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.*;
-import org.openqa.selenium.support.ui.*;
-
-import java.time.Duration;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.List;
 
-public class ProductPage {
-
-    private final WebDriver driver;
-    private final WebDriverWait wait;
+/**
+ * Página de productos utilizada para realizar búsquedas y añadir artículos al carrito.
+ */
+public class ProductPage extends BasePage {
 
     @FindBy(css = "input[aria-label='Search']")
     private WebElement inputBuscar;
 
+    @FindBy(css = "mat-card")
+    private List<WebElement> productos;
+
     public ProductPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        PageFactory.initElements(driver, this);
+        super(driver);
     }
 
-    public void searchAndAddToCart(String nombreProducto) {
-        // Buscar el producto
+    /**
+     * Busca un producto por nombre y lo agrega al carrito si está presente.
+     */
+    public void buscarYAgregarAlCarrito(String nombreProducto) {
         wait.until(ExpectedConditions.elementToBeClickable(inputBuscar)).clear();
         inputBuscar.sendKeys(nombreProducto + Keys.ENTER);
 
-        // Esperar los resultados
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("mat-card")));
-
-        // Obtener la lista de productos encontrados
-        List<WebElement> productos = driver.findElements(By.cssSelector("mat-card"));
+        wait.until(ExpectedConditions.visibilityOfAllElements(productos));
 
         for (WebElement producto : productos) {
             String nombre = producto.getText().toLowerCase();

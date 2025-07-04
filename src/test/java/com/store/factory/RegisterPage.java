@@ -1,14 +1,15 @@
 package com.store.factory;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.*;
-import org.openqa.selenium.support.ui.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.time.Duration;
-
-public class RegisterPage {
-    private final WebDriver driver;
-    private final WebDriverWait wait;
+/**
+ * Página de registro de usuarios.
+ */
+public class RegisterPage extends BasePage {
 
     @FindBy(id = "emailControl") private WebElement emailInput;
     @FindBy(id = "passwordControl") private WebElement passwordInput;
@@ -18,9 +19,7 @@ public class RegisterPage {
     @FindBy(id = "registerButton") private WebElement registerBtn;
 
     public RegisterPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        PageFactory.initElements(driver, this);
+        super(driver);
     }
 
     public void completarFormulario(String email, String password, String repeat, String pregunta, String respuesta) {
@@ -46,10 +45,8 @@ public class RegisterPage {
     }
 
     public String obtenerMensajeDeConfirmacionEsperado(String esperado) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-
-        return wait.until(driver -> {
-            WebElement snackbar = driver.findElement(By.cssSelector(".mat-mdc-snack-bar-label.mdc-snackbar__label"));
+        return wait.until(d -> {
+            WebElement snackbar = d.findElement(By.cssSelector(".mat-mdc-snack-bar-label.mdc-snackbar__label"));
             String texto = snackbar.getText().trim();
             return texto.contains(esperado) ? texto : null;
         });

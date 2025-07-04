@@ -26,14 +26,14 @@ public class OrderSteps {
         List<Map<String, String>> productos = dataTable.asMaps(String.class, String.class);
         for (Map<String, String> fila : productos) {
             String producto = fila.get("producto");
-            productPage.searchAndAddToCart(producto);
+            productPage.buscarYAgregarAlCarrito(producto);
         }
     }
 
     @When("procede al checkout desde el carrito")
     public void procederAlCheckout() {
         cartPage = new CartPage(driver);
-        cartPage.openCartAndCheckout();
+        cartPage.abrirCarritoYProcederAlCheckout();
     }
 
     @And("elige la segunda dirección guardada")

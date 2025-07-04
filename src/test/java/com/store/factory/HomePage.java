@@ -1,24 +1,23 @@
 package com.store.factory;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.*;
-import org.openqa.selenium.support.ui.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.time.Duration;
-
-public class HomePage {
-
-    private final WebDriver driver;
-    private final WebDriverWait wait;
+/**
+ * Representa la página principal de la aplicación.
+ */
+public class HomePage extends BasePage {
 
     @FindBy(css = "button[aria-label='Close Welcome Banner']") private WebElement cerrarPopup;
     @FindBy(id = "navbarAccount") private WebElement botonAccount;
     @FindBy(id = "navbarLoginButton") private WebElement botonLogin;
 
     public HomePage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        PageFactory.initElements(driver, this);
+        super(driver);
     }
 
     public void cerrarPopupInicialSiExiste() {
@@ -35,9 +34,7 @@ public class HomePage {
     }
 
     public void irASeccionAccount() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement botonAccount = wait.until(ExpectedConditions.elementToBeClickable(By.id("navbarAccount")));
-        botonAccount.click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("navbarAccount"))).click();
     }
 
     public void irAMisDirecciones() {

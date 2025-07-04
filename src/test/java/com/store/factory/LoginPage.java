@@ -1,15 +1,18 @@
 package com.store.factory;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.*;
-import org.openqa.selenium.support.ui.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.time.Duration;
-
-public class LoginPage {
-
-    private final WebDriver driver;
-    private final WebDriverWait wait;
+/**
+ * Página de inicio de sesión de Juice Shop.
+ */
+public class LoginPage extends BasePage {
 
     @FindBy(xpath = "//a[contains(text(),'Not yet a customer?')]")
     private WebElement enlaceRegistro;
@@ -27,16 +30,13 @@ public class LoginPage {
     private WebElement snackbar;
 
     public void ingresarCredenciales(String email, String password) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-
         wait.until(ExpectedConditions.visibilityOf(emailInput)).clear();
         emailInput.sendKeys(email);
 
         wait.until(ExpectedConditions.visibilityOf(passwordInput)).clear();
         passwordInput.sendKeys(password);
 
-        // Esperar a que el botón esté habilitado en el DOM
-        wait.until(driver -> loginButton.isEnabled());
+        wait.until(d -> loginButton.isEnabled());
     }
 
     public void enviarLogin() {
@@ -46,15 +46,12 @@ public class LoginPage {
 
 
     public String obtenerMensajeBienvenida() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         return wait.until(ExpectedConditions.visibilityOf(snackbar)).getText().trim();
     }
 
 
     public LoginPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        PageFactory.initElements(driver, this);
+        super(driver);
     }
 
     public void irAFormularioRegistro() {
@@ -67,10 +64,7 @@ public class LoginPage {
     }
 
     public boolean validarCorreoDesplegado(String emailEsperado) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-
         try {
-            // Hacer clic en "Account"
             WebElement botonAccount = wait.until(ExpectedConditions.elementToBeClickable(By.id("navbarAccount")));
             botonAccount.click();
 
@@ -92,7 +86,6 @@ public class LoginPage {
 
 
     public boolean mensajeErrorVisible() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
         try {
             WebElement errorDiv = wait.until(ExpectedConditions.visibilityOfElementLocated(
                     By.cssSelector("div.error.ng-star-inserted")));
