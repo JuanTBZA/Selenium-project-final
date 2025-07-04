@@ -1,14 +1,15 @@
 package com.store.factory;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.*;
+import org.openqa.selenium.support.ui.*;
 
-/**
- * Página que representa el carrito de compras.
- */
-public class CartPage extends BasePage {
+import java.time.Duration;
+
+public class CartPage {
+
+    private final WebDriver driver;
+    private final WebDriverWait wait;
 
     @FindBy(css = "button[aria-label='Show the shopping cart']")
     private WebElement botonVerCarrito;
@@ -17,7 +18,9 @@ public class CartPage extends BasePage {
     private WebElement botonCheckout;
 
     public CartPage(WebDriver driver) {
-        super(driver);
+        this.driver = driver;
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        PageFactory.initElements(driver, this);
     }
 
     public void openCartAndCheckout() {

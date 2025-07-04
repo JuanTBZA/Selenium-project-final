@@ -3,7 +3,7 @@ Feature: Realizar un pedido completo con múltiples productos, dirección y mét
   Background:
     Given el usuario accede a Juice Shop
     And abre la página de login desde el menú de cuenta
-    And inicia sesión con email "juan@gmail.com" y contraseña "coco20045"
+    And inicia sesión con email "probando001@gmail.com" y contraseña "Password123"
 
   @pedido01
   Scenario: Completar un pedido con productos seleccionados, dirección y pago guardados
